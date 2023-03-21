@@ -33,10 +33,15 @@
 # parser. 
 
 import serial
+try:
+    from ublox_gps import UbloxGps
+except ImportError as err:
+    print(err)
+    import sys
+    sys.path.append('..')
+    from ublox_gps.ublox_gps import UbloxGps
 
-from ublox_gps import UbloxGps
-
-port = serial.Serial('/dev/serial0', baudrate=38400, timeout=1)
+port = serial.Serial('/dev/serial0', baudrate=9600, timeout=1)
 gps = UbloxGps(port)
 
 def run():
@@ -45,7 +50,8 @@ def run():
         print("Listening for UBX Messages")
         while True:
             try:
-                print(gps.stream_nmea())
+                line = port.readline().decode('utf-8')
+                print(line)
             except (ValueError, IOError) as err:
                 print(err)
 
