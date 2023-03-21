@@ -3,3 +3,4 @@
 *.swp
 *.swo
 .qwiic_gps_ublox.py.swp
+**/__pycache__/**
