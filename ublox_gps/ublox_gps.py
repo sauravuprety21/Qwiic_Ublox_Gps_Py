@@ -279,7 +279,7 @@ class UbloxGps(object):
 class Payload:
     
     @staticmethod
-    def serialize(self, coreObj, payload:list):
+    def serialize(coreObj, payload:list):
         return struct.pack(coreObj.fmt(), *payload)
 
 
