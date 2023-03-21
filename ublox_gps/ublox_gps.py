@@ -246,6 +246,22 @@ class UbloxGps(object):
         parse_tool = core.Parser([sp.NAV_CLS])
         cls_name, msg_name, payload = parse_tool.receive_from(self.hard_port)
         return payload
+    
+
+    def get_cov_mat(self):
+        """
+        Sends a poll request for the NAV class with the COV Message ID and
+        parses ublox messages for the response. The payload is extracted from
+        the response which is then passed to the user.
+
+        :return: The payload of the NAV Class and COV Message ID
+        :rtype: namedtuple
+        """
+        self.send_message(sp.NAV_CLS, NAV_MSGS.get('COV'))
+        parse_tool = core.Parser([sp.NAV_CLS])
+        cls_name, msg_name, payload = parse_tool.receive_from(self.hard_port)
+        return payload
+
 
 
     def stream_nmea(self):
