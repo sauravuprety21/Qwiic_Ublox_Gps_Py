@@ -23,7 +23,10 @@ def main():
                 gps.send_message(NAV_CLS, NAV_MSGS.get('COV'))
                 parse_tool = Parser([NAV_CLS])
                 cls_name, msg_name, payload = parse_tool.receive_from(gps.hard_port)
-                print(msg_name, payload.iTOW)                             
+                if msg_name == 'PVT':
+                    print(f"Time:{payload.iTOW}\tLat:{payload.lat}\tLong:{payload.lon}")
+                else:
+                    print(f"Time:{payload.iTOW}\tvelNcov:{payload.velCovNN}\n")
                 
             except (ValueError, IOError) as err:
                 print(err)
