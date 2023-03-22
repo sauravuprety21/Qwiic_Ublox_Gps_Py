@@ -282,7 +282,7 @@ class Payload:
     
     @staticmethod
     def serialize(coreObj, payload:list):
-        return struct.pack(coreObj, *payload)
+        return struct.pack(coreObj.fmt, *payload)
 
 
 

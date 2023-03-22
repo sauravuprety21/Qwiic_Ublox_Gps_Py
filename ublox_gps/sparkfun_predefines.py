@@ -1108,7 +1108,6 @@ CFG_CLS = core.Cls(0x06, 'CFG',
                     CFG_CLS_VALDEL_MSG,    
                     CFG_CLS_VALGET_MSG,    
                     CFG_CLS_VALSET_MSG,   
-                    CFG_CLS_PRT_ALT_MSG, 
 ])
 
 
