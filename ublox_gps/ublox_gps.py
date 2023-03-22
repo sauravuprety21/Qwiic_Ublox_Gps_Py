@@ -280,7 +280,7 @@ class Payload:
     
     @staticmethod
     def serialize(coreObj, payload:list):
-        return struct.pack(coreObj.fmt(), *payload)
+        return struct.pack(coreObj.fmt, *payload)
 
 
 
@@ -327,8 +327,7 @@ class NMEACfg:
             parse_tool = core.Parser([sp.CFG_CLS, sp.ACK_CLS])
             cls_name, msg_name, payload = parse_tool.receive_from(dev_gps.hard_port)
 
-            if msg_name != 'ACK':
-                return False
+            print(key, msg_name)
             
         return True
 
