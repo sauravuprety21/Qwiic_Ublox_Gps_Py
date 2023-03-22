@@ -15,7 +15,8 @@ gps = UbloxGps(ser)
 
 def main():
     NMEACfg.disable_all(gps)
-    NMEACfg.enable_msg(gps, 'GSV', 1)
+    NMEACfg.enable_msg(gps, 'GST', 1)
+    NMEACfg.enable_msg(gps, 'GSA', 1)
     try:
         while 1:
             try:
