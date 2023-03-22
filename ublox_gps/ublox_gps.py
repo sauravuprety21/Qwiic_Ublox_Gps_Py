@@ -179,7 +179,7 @@ class UbloxGps(object):
     def get_UART1_cfg(self):
         self.send_message(sp.CFG_CLS, 
                           CFG_MSGS.get('PRT'), 
-                          Payload.serialize(sp.CFG_CLS_PRT_MSG, [UART_PORT_ID]))
+                          Payload.serialize(sp.CFG_CLS_PRT_ALT_MSG, [UART_PORT_ID]))
         
         parse_tool = core.Parser([sp.CFG_CLS, sp.ACK_CLS])
         cls_name, msg_name, payload = parse_tool.receive_from(self.hard_port)
