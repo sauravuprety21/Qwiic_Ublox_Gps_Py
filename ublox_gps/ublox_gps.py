@@ -183,26 +183,28 @@ class UbloxGps(object):
                           Payload.serialize(sp.CFG_CLS_PRT_POLL_MSG, [UART_PORT_ID]))
         
         parse_tool = core.Parser([sp.CFG_CLS, sp.ACK_CLS])
-        cls_name, msg_name, payload = parse_tool.receive_from(self.hard_port)
-        return payload
+        cls_name, msg_name, cfg_payload = parse_tool.receive_from(self.hard_port)
+        ack_ = parse_tool.receive_from(self.hard_port)
+
+        return cfg_payload
     
 
     def set_baudrate_UART1(self, br: int):
         
         prt_cfg = self.get_UART1_cfg()
-        prt_cfg.baudRate = br
+        prt_cfg = prt_cfg._replace(baudRate=br)
 
         self.send_message(sp.CFG_CLS, CFG_MSGS.get('PRT'),  Payload.serialize(sp.CFG_CLS_PRT_UART_MSG,list(prt_cfg)))
         
+        parse_tool = core.Parser([sp.CFG_CLS, sp.ACK_CLS])
 
-        parse_tool = core.Parse([sp.CFG_CLS, sp.ACK_CLS])
-
-        cls_name, msg_name, payload = parse_tool.receive_from(self.hard_port)
-
-        if msg_name == 'ACK':
-            self.hard_port.close()
-            self.hard_port = serial.Serial("/dev/serial0/", br, timeout=1)
+        ack_ = parse_tool.receive_from(self.hard_port)
+    
+        if ack_.name == 'ACK':
+            self.hard_port.setBaudrate(br)
             return True
+
+        return False
 
     
     def enable_outprotocol(self, *args) ->bool:
@@ -228,11 +230,9 @@ class UbloxGps(object):
         self.send_message(sp.CFG_CLS, CFG_MSGS.get('PRT'),  Payload.serialize(sp.CFG_CLS_PRT_UART_MSG,list(prt_cfg)))
         parse_tool = core.Parser([sp.CFG_CLS, sp.ACK_CLS])
         cls_name, msg_name, payload = parse_tool.receive_from(self.hard_port)
+        ack_ = parse_tool.receive_from(self.hard_port)
 
-        if msg_name == 'ACK':
-            return True
-        
-        return False
+        return ack_.name == 'ACK'
         
 
     def geo_coords(self):
@@ -310,14 +310,14 @@ class NMEACfg:
         payload = Payload.serialize(sp.CFG_CLS_MSG_MSG, [NMEACfg.NMEA_MSG_CLS_ID[msg][0], 
                                                 NMEACfg.NMEA_MSG_CLS_ID[msg][1],
                 rate])
+        
         dev_gps.send_message(sp.CFG_CLS, CFG_MSGS.get('MSG'), payload)
+
         parse_tool = core.Parser([sp.CFG_CLS, sp.ACK_CLS])
         cls_name, msg_name, payload = parse_tool.receive_from(dev_gps.hard_port)
+        ack_ = parse_tool.receive_from(dev_gps.hard_port)
 
-        if msg_name != 'ACK':
-            return False
-
-        return True
+        return ack_[1] == 'ACK'
                                                                     
     
     @staticmethod
@@ -326,11 +326,11 @@ class NMEACfg:
             payload = Payload.serialize(sp.CFG_CLS_MSG_MSG, [val[0], 
                                                 val[1], 0])
             dev_gps.send_message(sp.CFG_CLS, CFG_MSGS.get('MSG'), payload)
-            parse_tool = core.Parser([sp.CFG_CLS, sp.ACK_CLS])
-            cls_name, msg_name, payload = parse_tool.receive_from(dev_gps.hard_port)
-
-            if msg_name != 'ACK':
-                return False
             
-        return True
+            parse_tool = core.Parser([sp.CFG_CLS, sp.ACK_CLS])
+            
+            cls_name, msg_name, payload = parse_tool.receive_from(dev_gps.hard_port)
+            ack_ = parse_tool.receive_from(dev_gps.hard_port)
+
+        return ack_.name == 'ACK'
 
