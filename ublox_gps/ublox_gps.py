@@ -177,6 +177,7 @@ class UbloxGps(object):
 
 
     def get_UART1_cfg(self):
+          
         self.send_message(sp.CFG_CLS, 
                           CFG_MSGS.get('PRT'), 
                           Payload.serialize(sp.CFG_CLS_PRT_ALT_MSG, [UART_PORT_ID]))
@@ -192,6 +193,7 @@ class UbloxGps(object):
         prt_cfg.baudRate = br
 
         self.send_message(sp.CFG_CLS, CFG_MSGS.get('PRT'),  Payload.serialize(sp.CFG_CLS_PRT_MSG,list(prt_cfg)))
+        
 
         parse_tool = core.Parse([sp.CFG_CLS, sp.ACK_CLS])
 
@@ -279,8 +281,8 @@ class UbloxGps(object):
 class Payload:
     
     @staticmethod
-    def serialize(self, coreObj, payload:list):
-        return struct.pack(coreObj.fmt(), *payload)
+    def serialize(coreObj, payload:list):
+        return struct.pack(coreObj, *payload)
 
 
 
