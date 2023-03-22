@@ -34,9 +34,9 @@ CFG_CLS_PIO_MSG = core.Message(0x2C, 'PIO', [
                                 ]) 
                     ])
 
-CFG_CLS_PRT_MSG = core.Message(0x00, 'PRT', [
+CFG_CLS_PRT_UART_MSG = core.Message(0x00, 'PRT', [
                         core.Field('portID', 'U1'),
-                        core.PadByte(repeat=1),
+                        core.PadByte(repeat=0),
                         core.BitField('txReady', 'X2', [
                             core.Flag('en', 0, 1),
                             core.Flag('pol', 1, 2),
@@ -63,10 +63,10 @@ CFG_CLS_PRT_MSG = core.Message(0x00, 'PRT', [
                         core.BitField('flags', 'X2', [
                             core.Flag('extendedTxTimeout', 0, 1),
                         ]),
-                        core.PadByte(repeat=2)
+                        core.PadByte(repeat=1)
                     ])
 
-CFG_CLS_PRT_ALT_MSG = core.Message(0x00, 'PRT',[
+CFG_CLS_PRT_POLL_MSG = core.Message(0x00, 'PRT',[
                         core.Field('portID', 'U1'),
                      ])
 
@@ -1100,7 +1100,7 @@ CFG_CLS = core.Cls(0x06, 'CFG',
                     CFG_CLS_MSG_MSG,
                     CFG_CLS_OTP_MSG,
                     CFG_CLS_PIO_MSG,    
-                    CFG_CLS_PRT_MSG, 
+                    CFG_CLS_PRT_UART_MSG, 
                     CFG_CLS_PT2_MSG,
                     CFG_CLS_RST_MSG,    
                     CFG_CLS_SPT_MSG,    
