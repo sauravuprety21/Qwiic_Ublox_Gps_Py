@@ -66,6 +66,10 @@ CFG_CLS_PRT_MSG = core.Message(0x00, 'PRT', [
                         core.PadByte(repeat=2)
                     ])
 
+CFG_CLS_PRT_ALT_MSG = core.Message(0x00, 'PRT',[
+                        core.Field('portID', 'U1'),
+                     ])
+
 CFG_CLS_PT2_MSG = core.Message(0x59, 'PT2', [
                         core.Field('version', 'U1'),
                         core.BitField('activate', 'X1', [
@@ -183,28 +187,6 @@ INF_CLS_WARNING_MSG = core.Message(0x01, 'WARNING', [
                         ]),
                     ])
 
-
-ACK_CLS = core.Cls(0x05, 'ACK', 
-                   [
-                    ACK_CLS_ACK_MSG,
-                    ACK_CLS_NACK_MSG
-                    ])
-
-
-CFG_CLS = core.Cls(0x06, 'CFG', 
-                    [
-                    CFG_CLS_MSG_MSG,
-                    CFG_CLS_OTP_MSG,
-                    CFG_CLS_PIO_MSG,    
-                    CFG_CLS_PRT_MSG,    
-                    CFG_CLS_PT2_MSG,
-                    CFG_CLS_RST_MSG,    
-                    CFG_CLS_SPT_MSG,    
-                    CFG_CLS_USBTEST_MSG,    
-                    CFG_CLS_VALDEL_MSG,    
-                    CFG_CLS_VALGET_MSG,    
-                    CFG_CLS_VALSET_MSG,    
-])
 
 MGA_CLS_ACK_MSG = core.Message(0x60, 'ACK', [
                     core.Field('type', 'U1'),
@@ -1102,6 +1084,33 @@ TIM_CLS_VRFY_MSG = core.Message(0x06, 'VRFY', [
                             core.Flag('src', 0, 3)
                         ]),
                     ])
+
+
+
+
+ACK_CLS = core.Cls(0x05, 'ACK', 
+                   [
+                    ACK_CLS_ACK_MSG,
+                    ACK_CLS_NACK_MSG
+                    ])
+
+
+CFG_CLS = core.Cls(0x06, 'CFG', 
+                    [
+                    CFG_CLS_MSG_MSG,
+                    CFG_CLS_OTP_MSG,
+                    CFG_CLS_PIO_MSG,    
+                    CFG_CLS_PRT_MSG, 
+                    CFG_CLS_PRT_ALT_MSG,     
+                    CFG_CLS_PT2_MSG,
+                    CFG_CLS_RST_MSG,    
+                    CFG_CLS_SPT_MSG,    
+                    CFG_CLS_USBTEST_MSG,    
+                    CFG_CLS_VALDEL_MSG,    
+                    CFG_CLS_VALGET_MSG,    
+                    CFG_CLS_VALSET_MSG,   
+                    CFG_CLS_PRT_ALT_MSG, 
+])
 
 
 INF_CLS = core.Cls(0x04, 'INF', 

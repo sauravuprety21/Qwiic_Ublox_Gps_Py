@@ -279,8 +279,8 @@ class UbloxGps(object):
 class Payload:
     
     @staticmethod
-    def serialize(coreObj, payload:list):
-        return struct.pack(coreObj.fmt, *payload)
+    def serialize(self, coreObj, payload:list):
+        return struct.pack(coreObj.fmt(), *payload)
 
 
 
@@ -327,7 +327,8 @@ class NMEACfg:
             parse_tool = core.Parser([sp.CFG_CLS, sp.ACK_CLS])
             cls_name, msg_name, payload = parse_tool.receive_from(dev_gps.hard_port)
 
-            print(key, msg_name)
+            if msg_name != 'ACK':
+                return False
             
         return True
 
