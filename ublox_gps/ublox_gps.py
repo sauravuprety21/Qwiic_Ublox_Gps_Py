@@ -45,7 +45,7 @@
 
 import struct
 import serial
-
+import time
 
 from . import sparkfun_predefines as sp
 from . import core
@@ -177,34 +177,40 @@ class UbloxGps(object):
 
 
     def get_UART1_cfg(self):
-          
+        print("GETTING")
         self.send_message(sp.CFG_CLS, 
                           CFG_MSGS.get('PRT'), 
                           Payload.serialize(sp.CFG_CLS_PRT_POLL_MSG, [UART_PORT_ID]))
         
         parse_tool = core.Parser([sp.CFG_CLS, sp.ACK_CLS])
         cls_name, msg_name, cfg_payload = parse_tool.receive_from(self.hard_port)
+        print('CFG',cls_name, cfg_payload)       
+        print(Payload.serialize_Parsed_MSG(sp.CFG_CLS_PRT_UART_MSG, cfg_payload))
         ack_ = parse_tool.receive_from(self.hard_port)
-
+        print('ACK',ack_)
+        print()
         return cfg_payload
     
 
+
     def set_baudrate_UART1(self, br: int):
-        
+        print("SETTING")
         prt_cfg = self.get_UART1_cfg()
         prt_cfg = prt_cfg._replace(baudRate=br)
-        
+        print('SET TO', prt_cfg)        
         self.send_message(sp.CFG_CLS, CFG_MSGS.get('PRT'), 
                 Payload.serialize_Parsed_MSG(sp.CFG_CLS_PRT_UART_MSG,prt_cfg))
+        print(Payload.serialize_Parsed_MSG(sp.CFG_CLS_PRT_UART_MSG, prt_cfg))
+        parse_tool = core.Parser([sp.CFG_CLS, sp.ACK_CLS])     
         
-        parse_tool = core.Parser([sp.CFG_CLS, sp.ACK_CLS])
+        setattr(self.hard_port, 'baudrate', br)
+        print(self.hard_port.baudrate)
 
         ack_ = parse_tool.receive_from(self.hard_port)
-    
-        if ack_.name == 'ACK':
-            self.hard_port.setBaudrate(br)
-            return True
-
+        print('ACK',ack_)
+         
+        print()
+          
         return False
      
 
@@ -288,17 +294,17 @@ class Payload:
                              fields in message {}".format(len(_lst_payload),len(msg._fields)))
         
         numPadBytes = 0
-
+       
         # Message and payload should have the same number of elements
         for i, field in enumerate(msg._fields):
-            print(i, _lst_payload[i-numPadBytes])
+           
             if isinstance(field, core.PadByte):
                 numPadBytes +=1
 
             if isinstance(field, core.BitField):
                 _val = Payload.evaluate_BitFields(field,_lst_payload[i-numPadBytes])
-                _lst_payload[i] = _val
-
+                _lst_payload[i-1] = _val
+        
         return Payload.serialize(msg, _lst_payload)
 
 
@@ -367,6 +373,4 @@ class NMEACfg:
             
             cls_name, msg_name, payload = parse_tool.receive_from(dev_gps.hard_port)
             ack_ = parse_tool.receive_from(dev_gps.hard_port)
-
-        return ack_.name == 'ACK'
 
