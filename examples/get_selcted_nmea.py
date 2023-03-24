@@ -9,7 +9,7 @@ from ublox_gps.ublox_gps import UbloxGps, NMEACfg
 import serial
 
 port = '/dev/serial0'
-ser = serial.Serial(port, baudrate=9600, timeout=1)
+ser = serial.Serial(port, baudrate=38400, timeout=1)
 gps = UbloxGps(ser)
 
 
