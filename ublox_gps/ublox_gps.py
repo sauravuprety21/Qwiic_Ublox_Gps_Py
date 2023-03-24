@@ -356,9 +356,9 @@ class NMEACfg:
         dev_gps.send_message(sp.CFG_CLS, CFG_MSGS.get('MSG'), payload)
 
         parse_tool = core.Parser([sp.CFG_CLS, sp.ACK_CLS])
-        cls_name, msg_name, payload = parse_tool.receive_from(dev_gps.hard_port)
+       # cls_name, msg_name, payload = parse_tool.receive_from(dev_gps.hard_port)
         ack_ = parse_tool.receive_from(dev_gps.hard_port)
-
+        print(ack_)
         return ack_[1] == 'ACK'
                                                                     
     
@@ -371,6 +371,6 @@ class NMEACfg:
             
             parse_tool = core.Parser([sp.CFG_CLS, sp.ACK_CLS])
             
-            cls_name, msg_name, payload = parse_tool.receive_from(dev_gps.hard_port)
+        #    cls_name, msg_name, payload = parse_tool.receive_from(dev_gps.hard_port)
             ack_ = parse_tool.receive_from(dev_gps.hard_port)
-
+            print(ack_)
