@@ -193,8 +193,9 @@ class UbloxGps(object):
         
         prt_cfg = self.get_UART1_cfg()
         prt_cfg = prt_cfg._replace(baudRate=br)
-
-        self.send_message(sp.CFG_CLS, CFG_MSGS.get('PRT'),  Payload.serialize(sp.CFG_CLS_PRT_UART_MSG,list(prt_cfg)))
+        
+        self.send_message(sp.CFG_CLS, CFG_MSGS.get('PRT'), 
+                Payload.serialize_Parsed_MSG(sp.CFG_CLS_PRT_UART_MSG,prt_cfg))
         
         parse_tool = core.Parser([sp.CFG_CLS, sp.ACK_CLS])
 
@@ -205,35 +206,8 @@ class UbloxGps(object):
             return True
 
         return False
+     
 
-    
-    def enable_outprotocol(self, *args) ->bool:
-        """
-        Enable one/multiple outputprotocols
-        :param *arg
-
-        :return: True on completion
-        :rtype: boolean
-        """
-        prt_cfg = self.get_UART1_cfg()
-
-        _mask = prt_cfg.outProtoMask    
-
-        for bitmask in args:
-            if bitmask not in OUTPROTO_MASKS:
-                raise ValueError(f"Protocols must be in {OUTPROTO_MASKS.keys()}")
-            
-            _mask |= bitmask
-        
-        prt_cfg.outProtoMask = _mask
-
-        self.send_message(sp.CFG_CLS, CFG_MSGS.get('PRT'),  Payload.serialize(sp.CFG_CLS_PRT_UART_MSG,list(prt_cfg)))
-        parse_tool = core.Parser([sp.CFG_CLS, sp.ACK_CLS])
-        cls_name, msg_name, payload = parse_tool.receive_from(self.hard_port)
-        ack_ = parse_tool.receive_from(self.hard_port)
-
-        return ack_.name == 'ACK'
-        
 
     def geo_coords(self):
         """
@@ -282,9 +256,65 @@ class Payload:
     
     @staticmethod
     def serialize(coreObj, payload:list):
+        """
+        :param coreObj:     an instance of a 'core' class, which hasattr '.fmt'
+        :payload:           data memebers of a named tuple instance which is described by the coreObj
+
+        :return: payload packed as per coreObj.fmt description
+        :rtype: byte-string
+        """
         return struct.pack(coreObj.fmt, *payload)
+    
+
+    @staticmethod
+    def is_NamedTuple(payload_member) -> bool:
+        """
+        Loose check for 'namedtuple' instances, the data from these must be extracted
+        """
+        return isinstance(payload_member, tuple)
+    
 
 
+    @staticmethod
+    def serialize_Parsed_MSG(msg:core.Message, _nt_payload):
+        """
+        Messages (core.Message)  parsed from receiver have bitfields where values are stored in flags.
+        These bitfields must be converted to numeric repr before serialized.
+        """
+        _lst_payload = list(_nt_payload)
+
+        if (len(_lst_payload) != len(msg._fields)):
+            raise ValueError("Number of members in the payload {} and fields in message {} \
+                             should be the same".format(len(_lst_payload),len(msg._fields)))
+
+        # Message and payload should have the same number of elements
+        for i, field in enumerate(msg._fields):
+            if isinstance(field, core.BitField):
+                _val = Payload.evaluate_BitFields(field,_lst_payload[i])
+                _lst_payload[i] = _val
+
+        return Payload.serialize(msg, _lst_payload)
+
+
+    @staticmethod
+    def evaluate_BitFields(bit_field:core.BitField, _nt):
+        """
+        Evaluate the value stored inside a namedtuple which represents a bit-field.
+        :param _nt          a named tuple instance with bitfield seperated by flag values
+        param:bit_field     core.BitField instancewhich contains the description of the named tuple
+                            (These are members of ***_MSG described in 'sparkfun_predefine' 
+                            e.g. CFG_CLS_PRT_UART_MSG._fields[2]) 
+
+        :return:            Sum of values stored by seperated members of the bitfield
+        """
+        _members = list(_nt)
+        _val = 0
+
+        for mem, sf in zip(_members, bit_field._subfields):
+            _val +=  mem << sf._start
+
+        return _val
+        
 
 class NMEACfg:
 
