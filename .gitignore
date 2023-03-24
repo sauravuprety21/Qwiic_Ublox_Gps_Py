@@ -3,4 +3,8 @@
 *.swp
 *.swo
 .qwiic_gps_ublox.py.swp
-**/__pycache__/**
+**/__pycache__/*
+build/*
+dist/*
+sparkfun_ublox_gps.egg-info/*
+*
