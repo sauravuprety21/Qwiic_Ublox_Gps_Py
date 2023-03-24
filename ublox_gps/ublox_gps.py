@@ -283,14 +283,20 @@ class Payload:
         """
         _lst_payload = list(_nt_payload)
 
-        if (len(_lst_payload) != len(msg._fields)):
-            raise ValueError("Number of members in the payload {} and fields in message {} \
-                             should be the same".format(len(_lst_payload),len(msg._fields)))
+        if (len(_lst_payload) > len(msg._fields)):
+            raise ValueError("Number of members in the payload {} must be less or equal to number of \
+                             fields in message {}".format(len(_lst_payload),len(msg._fields)))
+        
+        numPadBytes = 0
 
         # Message and payload should have the same number of elements
         for i, field in enumerate(msg._fields):
+            print(i, _lst_payload[i-numPadBytes])
+            if isinstance(field, core.PadByte):
+                numPadBytes +=1
+
             if isinstance(field, core.BitField):
-                _val = Payload.evaluate_BitFields(field,_lst_payload[i])
+                _val = Payload.evaluate_BitFields(field,_lst_payload[i-numPadBytes])
                 _lst_payload[i] = _val
 
         return Payload.serialize(msg, _lst_payload)
